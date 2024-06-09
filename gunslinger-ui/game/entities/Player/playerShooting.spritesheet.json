@@ -1,0 +1,34 @@
+{
+  "frames": {
+      "player1":
+      {
+          "frame": {"x":0,"y":0,"w":52,"h":32},
+          "spriteSourceSize": {"x":0,"y":0,"w":52,"h":32},
+          "sourceSize": {"w":52,"h":32},
+          "anchor": {"x":0,"y":0}
+      },
+      "player2":
+      {
+          "frame": {"x":53,"y":0,"w":52,"h":32},
+          "spriteSourceSize": {"x":0,"y":0,"w":52,"h":32},
+          "sourceSize": {"w":52,"h":32},
+          "anchor": {"x":0,"y":0}
+      },
+      "player3":
+      {
+          "frame": {"x":104,"y":0,"w":52,"h":32},
+          "spriteSourceSize": {"x":0,"y":0,"w":52,"h":32},
+          "sourceSize": {"w":52,"h":32},
+          "anchor": {"x":0,"y":0}
+      }
+  },
+  "animations": {
+      "player": ["player1", "player2", "player3"]
+  },
+  "meta": {
+      "image": "/img/jLXUvr4o.png",
+      "format": "RGBA8888",
+      "size": {"w":156,"h":32},
+      "scale": "1"
+  }
+}

@@ -1,0 +1,1 @@
+export { playerMachine } from './playerMachine'

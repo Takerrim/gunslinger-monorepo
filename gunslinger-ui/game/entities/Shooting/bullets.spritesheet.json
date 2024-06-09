@@ -1,0 +1,27 @@
+{
+  "frames": {
+      "bullet1":
+      {
+          "frame": {"x":0,"y":0,"w":12,"h":3},
+          "spriteSourceSize": {"x":0,"y":0,"w":64,"h":3},
+          "sourceSize": {"w":64,"h":3},
+          "anchor": {"x":0,"y":0}
+      },
+      "bullet2":
+      {
+          "frame": {"x":13,"y":0,"w":12,"h":3},
+          "spriteSourceSize": {"x":0,"y":0,"w":64,"h":3},
+          "sourceSize": {"w":64,"h":3},
+          "anchor": {"x":0,"y":0}
+      }
+  },
+  "animations": {
+      "bullet": ["bullet1", "bullet2"]
+  },
+  "meta": {
+      "image": "/img/sprBullet_strip4.png",
+      "format": "RGBA8888",
+      "size": {"w":64,"h":3},
+      "scale": "1"
+  }
+}
