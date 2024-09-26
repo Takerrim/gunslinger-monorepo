@@ -1,6 +1,6 @@
 import type { Sprite } from 'pixi.js'
 import { rectangleCollision } from '~/game/collision'
-import { toGlobal } from '~/game/game.helpers'
+import { toViewport } from '~/game/game.helpers'
 
 let instance: IntersectionManager | null = null
 
@@ -22,8 +22,8 @@ export class IntersectionManager {
   }
 
   testMapCollision(target: Sprite, container: Sprite) {
-    const containerGlobalPosition = toGlobal(container)
-    const targetGlobalPosition = toGlobal(target)
+    const containerGlobalPosition = toViewport(container)
+    const targetGlobalPosition = toViewport(target)
     if (targetGlobalPosition.x <= containerGlobalPosition.x) return 'left'
     if (targetGlobalPosition.x >= containerGlobalPosition.x + container.width)
       return 'right'
@@ -41,7 +41,7 @@ export class IntersectionManager {
   }
 
   isOverlappedWithObstacles = (target: Sprite) => {
-    const { x, y } = toGlobal(target)
+    const { x, y } = toViewport(target)
     return this.targets.some((intersectionTarget) => {
       return intersectionTarget.getBounds().contains(x, y)
     })

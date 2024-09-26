@@ -1,5 +1,7 @@
+export type PlayerAddress = string
+
 export type Duel = {
-  players: PlayerTypes.Data[]
+  players: Record<PlayerAddress, PlayerTypes.Data>
   winnerAddress: null | string
   status: 'active'
   duelId: number

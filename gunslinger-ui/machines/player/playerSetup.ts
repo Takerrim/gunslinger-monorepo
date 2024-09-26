@@ -7,7 +7,6 @@ export const playerSetup = setup({
       position: PlayerTypes.Position
       rotation: number
       hp: number
-      spawnSide: PlayerTypes.Data['spawnSide']
     },
     events: {} as
       | { type: 'move'; payload: PlayerTypes.Position }
@@ -18,6 +17,5 @@ export const playerSetup = setup({
       | { type: 'stopMovingAndFiring' }
       | { type: 'collectBonus'; payload: PlayerTypes.Data['bonus'] }
       | { type: 'rotate'; payload: PlayerTypes.Data['rotation'] }
-      | { type: 'setSpawnSide'; payload: PlayerTypes.Data['spawnSide'] }
   }
 })

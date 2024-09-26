@@ -1,8 +1,7 @@
-import { Application, Sprite } from 'pixi.js'
+import { Application, type IPointData } from 'pixi.js'
 import { prepareMap } from './prepareMap'
 import { playerActor } from '~/machines/player/playerMachine'
 import { eventBus } from './services/EventBus/EventBus'
-import { toGlobal } from './game.helpers'
 import { RealtimeManager } from './services/RealtimeManager'
 
 export const initGame = (map: GameTypes.Map) => {
@@ -32,18 +31,21 @@ export const initGame = (map: GameTypes.Map) => {
 
   eventBus.on('rotate', (rotation: number) => {
     playerActor.send({ type: 'rotate', payload: rotation })
-    // realtimeManager.sendPlayerRotation(rotation)
+    realtimeManager.sendPlayerRotation(rotation)
   })
 
   // eventBus.on('takeDamage', (damage: number) => {
   //   playerActor.send({ type: 'takeDamage', payload: damage })
   // })
 
-  eventBus.on('fire', (projectiles: Sprite[]) => {
+  eventBus.on('fire', (projectile: IPointData) => {
     playerActor.send({ type: 'fire' })
-    realtimeManager.sendProjectiles(
-      projectiles.map((projectile) => toGlobal(projectile))
-    )
+    realtimeManager.sendPlayerFiredEvent(projectile)
+  })
+
+  eventBus.on('playerProjectilesChanged', (projectiles: IPointData[]) => {
+    playerActor.send({ type: 'fire' })
+    realtimeManager.sendProjectiles(projectiles)
   })
 
   eventBus.on('ceaseFire', () => {

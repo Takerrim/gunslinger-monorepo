@@ -18,34 +18,32 @@ export const duel = new Elysia({ name: 'duel', prefix: '/duel' })
         const [firstPlayerAddress, secondPlayerAddress] = store.pendingPlayers
 
         const newDuel: Types.Duel = {
-          players: [
-            {
+          players: {
+            [firstPlayerAddress]: {
               address: firstPlayerAddress,
               hp: 100,
               bonus: null,
-              position: null,
-              initialPosition: {
+              position: {
                 x: 50,
-                y: GAME_MAP.height / 2,
+                y: 0,
               },
               rotation: null,
               /** TODO: set individual dimensions */
               dimensions: body.playerDimensions,
             },
-            {
+            [secondPlayerAddress]: {
               address: secondPlayerAddress,
               hp: 100,
               bonus: null,
-              position: null,
-              initialPosition: {
+              position: {
                 x: GAME_MAP.width - 50,
-                y: GAME_MAP.height / 2,
+                y: 0,
               },
               rotation: null,
               /** TODO: set individual dimensions */
               dimensions: body.playerDimensions,
             },
-          ] as Types.PlayerData[],
+          } as Types.Duel['players'],
           winnerAddress: null,
           status: 'active',
         }

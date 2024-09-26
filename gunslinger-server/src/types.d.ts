@@ -1,16 +1,15 @@
-export type PlayerPosition = {
+export type Position = {
   x: number
   y: number
 }
 
-export type PlayerDimensions = {
+export type Dimensions = {
   width: number
   height: number
 }
 
 export type PlayerData = {
-  position: PlayerPosition | null
-  initialPosition: PlayerPosition
+  position: Position
   /** @value in radians */
   rotation: number | null
   dimensions: PlayerDimensions
@@ -19,8 +18,10 @@ export type PlayerData = {
   bonus: null
 }
 
+type UserAddress = string
+
 export type Duel = {
-  players: PlayerData[]
+  players: Record<UserAddress, PlayerData>
   winnerAddress: null | string
   status: 'active'
 }

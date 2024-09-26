@@ -12,7 +12,10 @@ export class Background extends AbstractGameElement {
     this.#background.position.set(-(map.width / 2), -(map.height / 2))
 
     this.#background.name = 'background'
-    this.viewport.addChild(this.#background)
+  }
+
+  get sprite() {
+    return this.#background
   }
 
   protected update() {}

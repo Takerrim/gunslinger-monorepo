@@ -1,7 +1,7 @@
 import { Sprite, type Application, Spritesheet, BaseTexture } from 'pixi.js'
 import { AbstractGameElement } from '../AbstractGameElement'
 import bulletsSpritesheetJson from './bullets.spritesheet.json'
-import { toGlobal } from '~/game/game.helpers'
+import { toViewport } from '~/game/game.helpers'
 import { eventBus } from '~/game/services/EventBus/EventBus'
 
 const BULLET_SPEED_FACTOR = 20
@@ -9,7 +9,7 @@ const BULLET_SPEED_FACTOR = 20
 export class Shooting extends AbstractGameElement {
   spritesheet!: Spritesheet
 
-  timerId: NodeJS.Timeout | null = null
+  timerId: number | null = null
 
   constructor(app: Application) {
     super(app)
@@ -38,14 +38,19 @@ export class Shooting extends AbstractGameElement {
     if (this.player) {
       const { player } = this
 
-      this.timerId = setInterval(() => {
+      this.timerId = window.setInterval(() => {
         const projectile = Sprite.from(this.spritesheet.textures.bullet1)
-        const playerGlobalPosition = toGlobal(player)
-        projectile.position.set(playerGlobalPosition.x, playerGlobalPosition.y)
+        const playerViewportPosition = toViewport(player)
+        projectile.position.set(player.x, player.y)
         projectile.rotation = player.rotation
         projectile.cullable = true
         projectile.name = 'projectile'
-        this.app.stage.addChild(projectile)
+        this.viewport.addChild(projectile)
+
+        eventBus.emit('fire', {
+          x: projectile.position.x,
+          y: projectile.position.y
+        })
       }, 100)
     }
   }
@@ -55,7 +60,7 @@ export class Shooting extends AbstractGameElement {
   }
 
   get projectiles() {
-    return this.app.stage.children.filter(
+    return this.viewport.children.filter(
       (child) => child.name === 'projectile'
     ) as Sprite[]
   }
@@ -71,12 +76,25 @@ export class Shooting extends AbstractGameElement {
       this.projectiles.forEach((projectile) => {
         this.#changeBulletPosition(projectile)
 
-        if (this.isIntersected(projectile) || this.isOutOfMap(projectile)) {
+        if (
+          this.isIntersectedWithObstagles(projectile) ||
+          this.isOutOfMap(projectile)
+        ) {
           projectile.removeFromParent()
+
+          if (this.projectiles.length === 0) {
+            eventBus.emit('playerProjectilesChanged', [])
+          }
         }
       })
 
-      eventBus.emit('fire', this.projectiles)
+      eventBus.emit(
+        'playerProjectilesChanged',
+        this.projectiles.map((projectile) => ({
+          x: projectile.position.x,
+          y: projectile.position.y
+        }))
+      )
     }
   }
 }

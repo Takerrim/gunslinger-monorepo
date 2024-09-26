@@ -9,15 +9,14 @@ const blockchainStore = useBlockchainStore()
 
 const { playerAddress } = storeToRefs(blockchainStore)
 
-useAppFetch('/api/duel/start', {
-  method: 'POST',
-  body: {
-    playerAddress: playerAddress.value,
-    playerDimensions: {
-      width: 40,
-      height: 30,
-    },
-  },
+const { $api } = useNuxtApp()
+
+$api.duel.start.post({
+  playerAddress: playerAddress.value,
+  playerDimensions: {
+    width: 40,
+    height: 30
+  }
 })
 
 useGame()

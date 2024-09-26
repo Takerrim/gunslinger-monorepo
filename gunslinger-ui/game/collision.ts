@@ -1,7 +1,18 @@
 import type { Sprite } from 'pixi.js'
 
-// TODO: Refactor
-const addCollisionProperties = (sprite: Sprite) => {
+type AugmentedSprite = Sprite & {
+  gx?: number
+  gy?: number
+  centerX?: number
+  centerY?: number
+  halfWidth?: number
+  halfHeight?: number
+  xAnchorOffset?: number
+  yAnchorOffset?: number
+  _bumpPropertiesAdded?: boolean
+}
+
+const addCollisionProperties = (sprite: AugmentedSprite) => {
   //Add properties to Pixi sprites
   //gx
   if (sprite.gx === undefined) {
@@ -10,7 +21,7 @@ const addCollisionProperties = (sprite: Sprite) => {
         return sprite.getGlobalPosition().x
       },
       enumerable: true,
-      configurable: true,
+      configurable: true
     })
   }
 
@@ -21,7 +32,7 @@ const addCollisionProperties = (sprite: Sprite) => {
         return sprite.getGlobalPosition().y
       },
       enumerable: true,
-      configurable: true,
+      configurable: true
     })
   }
 
@@ -32,7 +43,7 @@ const addCollisionProperties = (sprite: Sprite) => {
         return sprite.x + sprite.width / 2
       },
       enumerable: true,
-      configurable: true,
+      configurable: true
     })
   }
 
@@ -43,7 +54,7 @@ const addCollisionProperties = (sprite: Sprite) => {
         return sprite.y + sprite.height / 2
       },
       enumerable: true,
-      configurable: true,
+      configurable: true
     })
   }
 
@@ -54,7 +65,7 @@ const addCollisionProperties = (sprite: Sprite) => {
         return sprite.width / 2
       },
       enumerable: true,
-      configurable: true,
+      configurable: true
     })
   }
 
@@ -65,7 +76,7 @@ const addCollisionProperties = (sprite: Sprite) => {
         return sprite.height / 2
       },
       enumerable: true,
-      configurable: true,
+      configurable: true
     })
   }
 
@@ -80,7 +91,7 @@ const addCollisionProperties = (sprite: Sprite) => {
         }
       },
       enumerable: true,
-      configurable: true,
+      configurable: true
     })
   }
 
@@ -95,33 +106,24 @@ const addCollisionProperties = (sprite: Sprite) => {
         }
       },
       enumerable: true,
-      configurable: true,
-    })
-  }
-
-  if (sprite.circular && sprite.radius === undefined) {
-    Object.defineProperty(sprite, 'radius', {
-      get() {
-        return sprite.width / 2
-      },
-      enumerable: true,
-      configurable: true,
+      configurable: true
     })
   }
 
   sprite._bumpPropertiesAdded = true
 }
 
-// TODO: Add types
 export const rectangleCollision = (
-  r1: Sprite,
-  r2: Sprite,
-  bounce = false,
+  r1: AugmentedSprite,
+  r2: AugmentedSprite,
   global = true
 ) => {
   //Add collision properties
   if (!r1._bumpPropertiesAdded) addCollisionProperties(r1)
   if (!r2._bumpPropertiesAdded) addCollisionProperties(r2)
+
+  const augmentedR1 = r1 as Required<AugmentedSprite>
+  const augmentedR2 = r2 as Required<AugmentedSprite>
 
   let collision,
     combinedHalfWidths,
@@ -134,33 +136,39 @@ export const rectangleCollision = (
   //Calculate the distance vector
   if (global) {
     vx =
-      r1.gx +
-      Math.abs(r1.halfWidth) -
-      r1.xAnchorOffset -
-      (r2.gx + Math.abs(r2.halfWidth) - r2.xAnchorOffset)
+      augmentedR1.gx +
+      Math.abs(augmentedR1.halfWidth) -
+      augmentedR1.xAnchorOffset -
+      (augmentedR2.gx +
+        Math.abs(augmentedR2.halfWidth) -
+        augmentedR2.xAnchorOffset)
     vy =
-      r1.gy +
-      Math.abs(r1.halfHeight) -
-      r1.yAnchorOffset -
-      (r2.gy + Math.abs(r2.halfHeight) - r2.yAnchorOffset)
+      augmentedR1.gy +
+      Math.abs(augmentedR1.halfHeight) -
+      augmentedR1.yAnchorOffset -
+      (augmentedR2.gy +
+        Math.abs(augmentedR2.halfHeight) -
+        augmentedR2.yAnchorOffset)
   } else {
-    //vx = r1.centerX - r2.centerX;
-    //vy = r1.centerY - r2.centerY;
-    vx =
-      r1.x +
-      Math.abs(r1.halfWidth) -
-      r1.xAnchorOffset -
-      (r2.x + Math.abs(r2.halfWidth) - r2.xAnchorOffset)
-    vy =
-      r1.y +
-      Math.abs(r1.halfHeight) -
-      r1.yAnchorOffset -
-      (r2.y + Math.abs(r2.halfHeight) - r2.yAnchorOffset)
+    //vx = augmentedR1.centerX - augmentedR2.centerX;
+    //vy = augmentedR1.centerY - augmentedR2.centerY;
+    // vx =
+    //   augmentedR1.x +
+    //   Math.abs(augmentedR1.halfWidth) -
+    //   augmentedR1.xAnchorOffset -
+    //   (augmentedR2.x + Math.abs(augmentedR2.halfWidth) - augmentedR2.xAnchorOffset)
+    // vy =
+    //   augmentedR1.y +
+    //   Math.abs(augmentedR1.halfHeight) -
+    //   augmentedR1.yAnchorOffset -
+    //   (augmentedR2.y + Math.abs(augmentedR2.halfHeight) - augmentedR2.yAnchorOffset)
   }
 
   //Figure out the combined half-widths and half-heights
-  combinedHalfWidths = Math.abs(r1.halfWidth) + Math.abs(r2.halfWidth)
-  combinedHalfHeights = Math.abs(r1.halfHeight) + Math.abs(r2.halfHeight)
+  combinedHalfWidths =
+    Math.abs(augmentedR1.halfWidth) + Math.abs(augmentedR2.halfWidth)
+  combinedHalfHeights =
+    Math.abs(augmentedR1.halfHeight) + Math.abs(augmentedR2.halfHeight)
 
   //Check whether vx is less than the combined half widths
   if (Math.abs(vx) < combinedHalfWidths) {
@@ -183,26 +191,11 @@ export const rectangleCollision = (
         if (vy > 0) {
           collision = 'top'
           //Move the rectangle out of the collision
-          r1.y = r1.y + overlapY
+          augmentedR1.y = augmentedR1.y + overlapY
         } else {
           collision = 'bottom'
           //Move the rectangle out of the collision
-          r1.y = r1.y - overlapY
-        }
-
-        //Bounce
-        if (bounce) {
-          r1.vy *= -1
-
-          /*Alternative
-          //Find the bounce surface's vx and vy properties
-          var s = {};
-          s.vx = r2.x - r2.x + r2.width;
-          s.vy = 0;
-
-          //Bounce r1 off the surface
-          //this.bounceOffSurface(r1, s);
-          */
+          augmentedR1.y = augmentedR1.y - overlapY
         }
       } else {
         //The collision is happening on the Y axis
@@ -211,26 +204,11 @@ export const rectangleCollision = (
         if (vx > 0) {
           collision = 'left'
           //Move the rectangle out of the collision
-          r1.x = r1.x + overlapX
+          augmentedR1.x = augmentedR1.x + overlapX
         } else {
           collision = 'right'
           //Move the rectangle out of the collision
-          r1.x = r1.x - overlapX
-        }
-
-        //Bounce
-        if (bounce) {
-          r1.vx *= -1
-
-          /*Alternative
-          //Find the bounce surface's vx and vy properties
-          var s = {};
-          s.vx = 0;
-          s.vy = r2.y - r2.y + r2.height;
-
-          //Bounce r1 off the surface
-          this.bounceOffSurface(r1, s);
-          */
+          augmentedR1.x = augmentedR1.x - overlapX
         }
       }
     } else {

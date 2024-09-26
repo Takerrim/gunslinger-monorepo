@@ -12,3 +12,15 @@ export const GAME_MAP = {
     },
   ],
 }
+
+export const WEAPON = {
+  riffle: {
+    projectileDimensions: {
+      width: 12,
+      height: 3,
+    },
+    // In percensts
+    // TODO: replace value with blockchain constant of specific weapon
+    damage: 13,
+  },
+}

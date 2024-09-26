@@ -4,6 +4,8 @@ import { RealtimeManager } from '~/game/services/RealtimeManager'
 export default () => {
   const duelStore = useDuelStore()
 
+  const { $api } = useNuxtApp()
+
   const blockchainStore = useBlockchainStore()
 
   const { playerAddress } = storeToRefs(blockchainStore)
@@ -14,14 +16,11 @@ export default () => {
     realtimeManager.on('duelStarted', async (duel: GameTypes.Duel) => {
       duelStore.setDuel(duel)
 
-      const map = await $fetch<GameTypes.Map>(
-        'http://localhost:5005/api/config/map',
-        {
-          method: 'GET'
-        }
-      )
+      const { data: map } = await $api.config.map.get()
 
-      initGame(map)
+      if (map) {
+        initGame(map)
+      }
     })
 
     realtimeManager.initConnection(

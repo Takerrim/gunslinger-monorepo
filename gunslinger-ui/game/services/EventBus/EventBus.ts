@@ -3,6 +3,7 @@ import EventEmitter from 'eventemitter3'
 type TEvents =
   | 'playerMoved'
   | 'fire'
+  | 'playerProjectilesChanged'
   | 'ceaseFire'
   | 'rotate'
   | 'takeDamage'

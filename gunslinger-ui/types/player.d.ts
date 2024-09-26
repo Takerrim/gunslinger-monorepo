@@ -11,7 +11,6 @@ export type PlayerDimensions = {
 
 export type Data = {
   position: Position
-  initialPosition: Position
   /** @value in radians */
   rotation: number
   dimensions: PlayerDimensions

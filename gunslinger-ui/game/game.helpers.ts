@@ -2,10 +2,9 @@ import { DisplayObject, Graphics, Point, Sprite } from 'pixi.js'
 
 export const drawRect = ({
   params,
-  anchor,
   fillColor,
   radius,
-  outline,
+  outline
 }: HelpersTypes.DrawRectParams) => {
   const graphics = new Graphics()
   if (fillColor) {
@@ -22,14 +21,15 @@ export const drawRect = ({
     graphics.drawRect(...params)
   }
 
-  anchor.addChild(graphics)
+  return graphics
 }
 
 // export const degreeToRadian = (degree: number) =>  degree * (Math.PI / 180)
 
 export const calculateAngle = (dx: number, dy: number) => Math.atan2(dy, dx)
 
-export const toGlobal = (obj: DisplayObject) => obj.toGlobal(new Point(0, 0))
+/** Calculate position relatively top-left side of viewport */
+export const toViewport = (obj: DisplayObject) => obj.toGlobal(new Point(0, 0))
 
 export const getDistance = (target1: Sprite, target2: Sprite) =>
   Math.hypot(Math.abs(target2.x - target1.x), Math.abs(target2.y - target1.y))

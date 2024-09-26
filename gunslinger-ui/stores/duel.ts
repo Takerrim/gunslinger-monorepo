@@ -3,11 +3,10 @@ export const useDuelStore = defineStore('duel', () => {
 
   const duel = ref<GameTypes.Duel | null>(null)
 
-  const player = computed(
-    () =>
-      duel.value?.players.find(
-        (player) => player.address === blockchainStore.playerAddress
-      )
+  const player = computed(() =>
+    Object.values(duel.value?.players ?? {}).find(
+      (player) => player.address === blockchainStore.playerAddress
+    )
   )
 
   const setDuel = (data: GameTypes.Duel | null) => {

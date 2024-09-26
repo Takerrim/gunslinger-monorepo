@@ -26,11 +26,11 @@ export abstract class AbstractGameElement {
     )
   }
 
-  protected isIntersected(target: Sprite) {
+  protected isIntersectedWithObstagles(target: Sprite) {
     return IntersectionManager.getInstance().isOverlappedWithObstacles(target)
   }
 
-  /** @description Because follow method of pixi-viewport makes starting point of map to center we have to subtract target position from background starting point */
+  /** @description Because "follow" method of pixi-viewport makes starting point of map to center we have to subtract target position from background starting point */
   getGlobalPosition(target: Sprite) {
     const map = this.viewport.getChildByName('background') as Sprite
     return Victor.fromObject(target.position)

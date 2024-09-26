@@ -9,16 +9,10 @@ const playerMachine = playerSetup.createMachine({
       y: 0
     },
     rotation: 0,
-    hp: 100,
-    spawnSide: 'left'
+    hp: 100
   },
   id: 'player',
   initial: 'idle',
-  on: {
-    setSpawnSide: {
-      actions: assign({ spawnSide: ({ event }) => event.payload })
-    }
-  },
   states: {
     idle: {
       on: {

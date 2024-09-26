@@ -8,11 +8,10 @@ import {
 import playerShootingSpritesheetJson from './playerShooting.spritesheet.json'
 import playerWalkSpritesheetJson from './playerWalk.spritesheet.json'
 import { AbstractGameElement } from '../AbstractGameElement'
-import { calculateAngle, toGlobal } from '~/game/game.helpers'
+import { calculateAngle, toViewport } from '~/game/game.helpers'
 import { Shooting } from '../Shooting'
 import { IntersectionManager } from '~/game/services/IntersectionManager'
 import { KeyboardService } from '~/game/services/KeyboardService'
-import Victor from 'victor'
 import { eventBus } from '~/game/services/EventBus/EventBus'
 
 const VELOCITY = 3
@@ -192,7 +191,7 @@ export class Player extends AbstractGameElement {
         break
     }
 
-    // eventBus.emit('playerMoved', this.getGlobalPosition(this.#player))
+    // eventBus.emit('playerMoved', toGlobal(this.#player))
     eventBus.emit('playerMoved', {
       x: this.#player.position.x,
       y: this.#player.position.y
@@ -200,7 +199,7 @@ export class Player extends AbstractGameElement {
   }
 
   #rotate(e: MouseEvent) {
-    const { x, y } = toGlobal(this.#player)
+    const { x, y } = toViewport(this.#player)
     const dx = e.x - x
     const dy = e.y - y
 

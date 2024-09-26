@@ -1,6 +1,6 @@
 import Sarus from '@anephenix/sarus'
 import EventEmitter from 'eventemitter3'
-import type { IPointData, Point } from 'pixi.js'
+import type { IPointData } from 'pixi.js'
 
 let instance: RealtimeManager | null = null
 
@@ -43,9 +43,13 @@ export class RealtimeManager extends EventEmitter<
     )
   }
 
-  sendProjectiles(projectiles: Point[]) {
+  sendPlayerFiredEvent(projectile: IPointData) {
+    this.#ws.send(JSON.stringify({ event: 'playerFired', data: projectile }))
+  }
+
+  sendProjectiles(projectiles: IPointData[]) {
     this.#ws.send(
-      JSON.stringify({ event: 'setProjectiles', data: projectiles })
+      JSON.stringify({ event: 'updateProjectiles', data: projectiles })
     )
   }
 

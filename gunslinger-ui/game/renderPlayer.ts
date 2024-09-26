@@ -7,13 +7,11 @@ export const renderPlayer = (app: Application, map: GameTypes.Map) => {
 
   const duelStore = useDuelStore()
 
+  // Needed to display player to initial position
   queueMicrotask(() => {
     if (!duelStore.player) return
 
-    player.sprite.position.set(
-      duelStore.player.initialPosition.x - map.width / 2,
-      duelStore.player.initialPosition.y - map.height / 2
-    )
+    player.sprite.position.set(duelStore.player.position.x - map.width / 2, 0)
 
     eventBus.emit('playerMoved', player.getGlobalPosition(player.sprite))
   })
