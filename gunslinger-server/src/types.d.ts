@@ -14,6 +14,7 @@ export type PlayerData = {
   rotation: number | null
   dimensions: PlayerDimensions
   address: string
+  /** In percents */
   hp: number
   bonus: null
 }

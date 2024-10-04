@@ -13,7 +13,7 @@ const buildWalls = (app: Application, map: GameTypes.Map) => {
     const wall = new Wall(app)
     wall.setCoords({ x: obstagles.position.x, y: obstagles.position.y })
     wall.setDimensions({ width: obstagles.width, height: obstagles.height })
-    IntersectionManager.getInstance().addTarget(wall.wallSprite)
+    IntersectionManager.getInstance().addObstacle(wall.wallSprite)
   })
 }
 
@@ -35,9 +35,8 @@ export const prepareMap = (app: Application, map: GameTypes.Map) => {
 
   const realtimeManager = RealtimeManager.getInstance()
 
-  realtimeManager.on('damageReceived', (damage: number) => {
-    console.log(damage)
-    hpBar.updateHpByDamage(damage)
+  realtimeManager.on('damageReceived', (data: { hp: number }) => {
+    hpBar.updateHp(data.hp)
   })
 
   renderPlayer(app, map)

@@ -1,10 +1,12 @@
 import { Sprite, type Application, Spritesheet, BaseTexture } from 'pixi.js'
 import { AbstractGameElement } from '../AbstractGameElement'
 import bulletsSpritesheetJson from './bullets.spritesheet.json'
-import { toViewport } from '~/game/game.helpers'
 import { eventBus } from '~/game/services/EventBus/EventBus'
+import { IntersectionManager } from '~/game/services/IntersectionManager'
 
 const BULLET_SPEED_FACTOR = 20
+
+const PROJECTILE_RENDER_NAME = 'projectile'
 
 export class Shooting extends AbstractGameElement {
   spritesheet!: Spritesheet
@@ -31,7 +33,7 @@ export class Shooting extends AbstractGameElement {
   }
 
   get player() {
-    return this.viewport.getChildByName('player')
+    return this.viewport.getChildByName('player') as Sprite
   }
 
   fire() {
@@ -40,11 +42,10 @@ export class Shooting extends AbstractGameElement {
 
       this.timerId = window.setInterval(() => {
         const projectile = Sprite.from(this.spritesheet.textures.bullet1)
-        const playerViewportPosition = toViewport(player)
-        projectile.position.set(player.x, player.y)
+        projectile.position.set(player.position.x, player.position.y)
         projectile.rotation = player.rotation
         projectile.cullable = true
-        projectile.name = 'projectile'
+        projectile.name = PROJECTILE_RENDER_NAME
         this.viewport.addChild(projectile)
 
         eventBus.emit('fire', {
@@ -61,7 +62,7 @@ export class Shooting extends AbstractGameElement {
 
   get projectiles() {
     return this.viewport.children.filter(
-      (child) => child.name === 'projectile'
+      (child) => child.name === PROJECTILE_RENDER_NAME
     ) as Sprite[]
   }
 
@@ -73,12 +74,25 @@ export class Shooting extends AbstractGameElement {
 
   protected update() {
     if (this.projectiles.length) {
+      const { isOverlappedWithProjectile } = IntersectionManager.getInstance()
+      eventBus.emit(
+        'playerProjectilesChanged',
+        this.projectiles.map((projectile) => ({
+          x: projectile.position.x,
+          y: projectile.position.y
+        }))
+      )
+
       this.projectiles.forEach((projectile) => {
         this.#changeBulletPosition(projectile)
 
         if (
           this.isIntersectedWithObstagles(projectile) ||
-          this.isOutOfMap(projectile)
+          this.isOutOfMap(projectile) ||
+          isOverlappedWithProjectile({
+            target: this.player,
+            projectile
+          })
         ) {
           projectile.removeFromParent()
 
@@ -87,14 +101,6 @@ export class Shooting extends AbstractGameElement {
           }
         }
       })
-
-      eventBus.emit(
-        'playerProjectilesChanged',
-        this.projectiles.map((projectile) => ({
-          x: projectile.position.x,
-          y: projectile.position.y
-        }))
-      )
     }
   }
 }

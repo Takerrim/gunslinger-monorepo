@@ -57,9 +57,9 @@ export class RealtimeManager extends EventEmitter<
     this.#ws.send(JSON.stringify({ event: 'waitDuel' }))
   }
 
-  handleMessage(event: any) {
+  handleMessage(message: any) {
     try {
-      const parsedMessage = JSON.parse(event.data) as RealtimeTypes.Message
+      const parsedMessage = JSON.parse(message.data) as RealtimeTypes.Message
       this.emit(parsedMessage.event, parsedMessage.data)
     } catch (e) {
       console.error(e)

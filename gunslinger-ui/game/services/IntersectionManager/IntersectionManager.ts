@@ -5,7 +5,7 @@ import { toViewport } from '~/game/game.helpers'
 let instance: IntersectionManager | null = null
 
 export class IntersectionManager {
-  targets: Sprite[] = []
+  obstacles: Sprite[] = []
 
   static getInstance() {
     if (!instance) {
@@ -17,8 +17,8 @@ export class IntersectionManager {
 
   private constructor() {}
 
-  addTarget(target: Sprite) {
-    this.targets.push(target)
+  addObstacle(obstacle: Sprite) {
+    this.obstacles.push(obstacle)
   }
 
   testMapCollision(target: Sprite, container: Sprite) {
@@ -34,16 +34,24 @@ export class IntersectionManager {
 
   /** @description Check whether target has reached boundary with obstacle */
   testObstacleCollisionSide(target: Sprite) {
-    for (let i = 0; i < this.targets.length; ++i) {
-      const collisionSide = rectangleCollision(target, this.targets[i])
+    for (let i = 0; i < this.obstacles.length; ++i) {
+      const collisionSide = rectangleCollision(target, this.obstacles[i])
       if (collisionSide) return collisionSide
     }
   }
 
   isOverlappedWithObstacles = (target: Sprite) => {
     const { x, y } = toViewport(target)
-    return this.targets.some((intersectionTarget) => {
-      return intersectionTarget.getBounds().contains(x, y)
+    return this.obstacles.some((obstacle) => {
+      return obstacle.getBounds().contains(x, y)
     })
+  }
+
+  isOverlappedWithProjectile = (data: {
+    target: Sprite
+    projectile: Sprite
+  }) => {
+    const { x, y } = toViewport(data.target)
+    return data.projectile.getBounds().contains(x, y)
   }
 }

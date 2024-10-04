@@ -53,5 +53,13 @@ export const initGame = (map: GameTypes.Map) => {
   })
 
   playerActor.start()
+
+  realtimeManager.on('win', () => {
+    app.destroy()
+  })
+
+  realtimeManager.on('loss', () => {
+    app.destroy()
+  })
   ;(globalThis as any).__PIXI_APP__ = app
 }

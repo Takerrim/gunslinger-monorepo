@@ -4,7 +4,6 @@ import { model } from './realtime.model'
 import { RealtimeService } from './realtime.service'
 import { testCollision } from '../../helpers/collision'
 import { WEAPON } from '../../constants'
-import { normalizeProjectilePosition } from '../../helpers/normalizeProjectilePosition'
 
 const getDuelStartedTopic = (userAddress: string) =>
   `duelStarted_${userAddress}`
@@ -19,6 +18,9 @@ const getEnemyFiredTopic = (userAddress: string) => `enemyFired_${userAddress}`
 
 const getPlayerHitEnemyTopic = (userAddress: string) =>
   `playerHitEnemy_${userAddress}`
+
+const getDuelFinishedTopic = (userAddress: string) =>
+  `duelFinished_${userAddress}`
 
 export const realtime = new Elysia({
   name: 'realtime',
@@ -44,6 +46,7 @@ export const realtime = new Elysia({
       ws.unsubscribe(getUpdatedEnemyDataTopic(ws.data.query.userAddress))
       ws.unsubscribe(getEnemyStoppedTopic(ws.data.query.userAddress))
       ws.unsubscribe(getPlayerHitEnemyTopic(ws.data.query.userAddress))
+      ws.unsubscribe(getDuelFinishedTopic(ws.data.query.userAddress))
 
       // TODO: Remove duel from active ones if ws connection suddenly closed
     },
@@ -62,6 +65,8 @@ export const realtime = new Elysia({
             ws.subscribe(getPlayerHitEnemyTopic(ws.data.query.userAddress))
 
             ws.subscribe(getEnemyFiredTopic(ws.data.query.userAddress))
+
+            ws.subscribe(getDuelFinishedTopic(ws.data.query.userAddress))
 
             if (activeDuel) {
               const payload = {
@@ -186,11 +191,6 @@ export const realtime = new Elysia({
 
             const playerProjectile = message.data as Types.Position
 
-            // activeDuel.players[ws.data.query.userAddress].projectiles = [
-            //   ...activeDuel.players[ws.data.query.userAddress].projectiles,
-            //   playerProjectile,
-            // ]
-
             const enemyAddress = ws.data.Service.getEnemyAddress(
               activeDuel.players,
               ws.data.query.userAddress
@@ -228,24 +228,14 @@ export const realtime = new Elysia({
               return
             }
 
-            // Update projectiles of player in duel
-            // activeDuel.players[ws.data.query.userAddress].projectiles =
-            //   clientProjectiles
-
-            // console.log(
-            //   '[updateProjectiles]: ',
-            //   activeDuel.players[enemyAddress].position
-            // )
-
             const hasPlayerHitEnemy = clientProjectiles.some(
               (projectilePosition) => {
                 return testCollision(
                   {
-                    position: normalizeProjectilePosition(projectilePosition),
+                    position: projectilePosition,
                     dimensions: WEAPON.riffle.projectileDimensions,
                   },
                   {
-                    // TODO: Проблема сейчас в том, что позиции противника остается одной и той же, даже если он пошел, понять, почему
                     position: activeDuel.players[enemyAddress].position,
                     dimensions: activeDuel.players[enemyAddress].dimensions,
                   }
@@ -254,19 +244,34 @@ export const realtime = new Elysia({
             )
 
             if (hasPlayerHitEnemy) {
-              ws.send({
-                event: 'hitEnemy',
-                data: {
-                  damage: WEAPON.riffle.damage,
-                },
-              })
+              activeDuel.players[enemyAddress].hp =
+                activeDuel.players[enemyAddress].hp - WEAPON.riffle.damage
 
-              ws.publish(getPlayerHitEnemyTopic(enemyAddress), {
-                event: 'damageReceived',
-                data: {
-                  damage: WEAPON.riffle.damage,
-                },
-              })
+              if (activeDuel.players[enemyAddress].hp <= 0) {
+                ws.send({
+                  event: 'win',
+                })
+
+                ws.publish(getDuelFinishedTopic(enemyAddress), {
+                  event: 'loss',
+                })
+
+                // TODO: finish duel and save result to blockchain
+              } else {
+                ws.send({
+                  event: 'hitEnemy',
+                  data: {
+                    hp: activeDuel.players[enemyAddress].hp,
+                  },
+                })
+
+                ws.publish(getPlayerHitEnemyTopic(enemyAddress), {
+                  event: 'damageReceived',
+                  data: {
+                    hp: activeDuel.players[enemyAddress].hp,
+                  },
+                })
+              }
             }
           }
           break

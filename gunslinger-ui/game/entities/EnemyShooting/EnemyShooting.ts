@@ -44,12 +44,12 @@ export class EnemyShooting extends AbstractGameElement {
       projectile.rotation = this.enemy.rotation
       projectile.cullable = true
       projectile.name = 'enemyProjectile'
-      this.app.stage.addChild(projectile)
+      this.viewport.addChild(projectile)
     }
   }
 
   get projectiles() {
-    return this.app.stage.children.filter(
+    return this.viewport.children.filter(
       (child) => child.name === 'enemyProjectile'
     ) as Sprite[]
   }

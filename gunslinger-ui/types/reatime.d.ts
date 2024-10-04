@@ -1,6 +1,8 @@
 export type Message = {
   event:
     | 'duelStarted'
+    | 'win'
+    | 'loss'
     | 'enemyDataUpdated'
     | 'enemyStopped'
     | 'enemyFired'
