@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 // Uncomment this line to use console.log
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
@@ -26,14 +26,16 @@ contract Game {
     using Math for uint256;
 
     event DepositSucceed();
-    event WithdrawalSucceed();
-
-    address private constant USDT_BEP20_ADDRESS = 0x55d398326f99059fF775485246999027B3197955;
+    event WithdrawalSucceed(address indexed player, uint256 amount, address token);
 
     // In percents
     uint256 private constant BASE_FEE = 2;
 
     mapping (address => Duel[]) public userToDuels;
+
+    function getDuels(address _user) public view returns (Duel[] memory) {
+        return userToDuels[_user];
+    }
 
     function createAndStartDuel(address[] memory _players, uint256 _betAmount) public {
         Duel memory duel = Duel(
@@ -49,23 +51,24 @@ contract Game {
         userToDuels[_players[1]].push(duel);
     }
 
-    function computeBetForPlayer(uint256 _betAmount) pure private returns (uint256) {
-        (bool success, uint256 result) = _betAmount.tryDiv(2);
-        require(success);
-        return result;
-    }
+    function _getActiveDuel(address _player) view private returns (Duel storage) {
+        require(userToDuels[_player].length > 0, "No duels found for this player");
 
-    function getActiveDuel(address _player) view private returns (Duel storage) {
-        Duel storage duel = userToDuels[_player][userToDuels[_player].length - 1];
+        uint256 lastIndex;
+        unchecked {
+            lastIndex = userToDuels[_player].length - 1;
+        }
+
+        Duel storage duel = userToDuels[_player][lastIndex];
 
         require(duel.status == DuelStatus.Started, "Duel is not active");
 
         return duel;
     }
 
-    function cancelDuel(address [] memory _players) public {
-        Duel storage duelOfFirstPlayer = getActiveDuel(_players[0]);
-        Duel storage duelOfSecondPlayer = getActiveDuel(_players[1]);
+    function cancelDuel(address [] memory _players, address _BEP20Token) public {
+        Duel storage duelOfFirstPlayer = _getActiveDuel(_players[0]);
+        Duel storage duelOfSecondPlayer = _getActiveDuel(_players[1]);
 
         require(duelOfFirstPlayer.status == DuelStatus.Started, "DuelOfFirstPlayer is not in started status");
         require(duelOfSecondPlayer.status == DuelStatus.Started, "DuelOfSecondPlayer is not in started status");
@@ -73,47 +76,65 @@ contract Game {
         duelOfFirstPlayer.status = DuelStatus.Canceled;
         duelOfSecondPlayer.status = DuelStatus.Canceled;
 
-        withdraw(_players[0], computeBetForPlayer(duelOfFirstPlayer.betAmount + percentsToAbs(duelOfFirstPlayer.betAmount, BASE_FEE)));
-        withdraw(_players[1], computeBetForPlayer(duelOfSecondPlayer.betAmount + percentsToAbs(duelOfSecondPlayer.betAmount, BASE_FEE)));
+        // Bet amount is always equal for each player, can get bet amount from first player 
+        uint256 betAmount = duelOfFirstPlayer.betAmount + _percentsToAbs(duelOfFirstPlayer.betAmount, BASE_FEE);
+
+        _withdraw(
+            _players[0],
+            betAmount,
+            _BEP20Token
+        );
+        _withdraw(
+            _players[1],
+            betAmount,
+            _BEP20Token
+        );
     }
 
-    function finishDuel(address _winner, address _loser) payable public {
-        Duel storage duelOfWinner = getActiveDuel(_winner);
-        Duel storage duelOfLoser = getActiveDuel(_loser);
+    function finishDuel(address _winner, address _loser, address _BEP20Token) payable public {
+        Duel storage duelOfWinner = _getActiveDuel(_winner);
+        Duel storage duelOfLoser = _getActiveDuel(_loser);
 
         duelOfWinner.finishedAt = block.timestamp;
         duelOfWinner.status = DuelStatus.Finished;
+        duelOfWinner.winner = _winner;
 
         duelOfLoser.finishedAt = block.timestamp;
         duelOfLoser.status = DuelStatus.Finished;
 
-        withdraw(_winner, duelOfWinner.betAmount);
+        (bool successMul, uint256 stake) = duelOfWinner.betAmount.tryMul(2);
+        require(successMul);
+
+        _withdraw(_winner, stake, _BEP20Token);
     }
 
-    function deposit(address _player, uint256 _betAmount) public  {
-        IERC20 usdtContract = IERC20(USDT_BEP20_ADDRESS);
-        uint256 allowance = usdtContract.allowance(_player, address(this));
+    function deposit(address _player, uint256 _betAmount, address _BEP20Token) public  {
+        IERC20 bep20Contract = IERC20(_BEP20Token);
+        uint256 allowance = bep20Contract.allowance(_player, address(this));
 
-        uint256 betAmountWithFee = _betAmount + percentsToAbs(_betAmount, BASE_FEE);
+        uint256 betAmountWithFee = _betAmount + _percentsToAbs(_betAmount, BASE_FEE);
 
-        if (allowance < _betAmount) {
-            bool successApprove = usdtContract.approve(address(this), betAmountWithFee);
-            require(successApprove, 'Approve failed');
-        }
+        require(allowance >= betAmountWithFee, "Insufficient allowance");
+        require(bep20Contract.balanceOf(_player) >= betAmountWithFee, "Insufficient balance");
 
-        bool successTransfer = usdtContract.transferFrom(_player, address(this), betAmountWithFee);
+        bool successTransfer = bep20Contract.transferFrom(_player, address(this), betAmountWithFee);
         require(successTransfer, 'Transfer failed');
         emit DepositSucceed();
     }
 
-    function withdraw(address _player, uint256 _betAmount) private  {
-        IERC20 usdtContract = IERC20(USDT_BEP20_ADDRESS);
-        bool success = usdtContract.transferFrom(address(this), _player, _betAmount);
+    function _withdraw(address _player, uint256 _betAmount, address _BEP20Token) private  {
+        IERC20 bep20Contract = IERC20(_BEP20Token);
+
+        uint256 contractBalance = bep20Contract.balanceOf(address(this));
+        require(contractBalance >= _betAmount, "Insufficient contract balance");
+
+        bool success = bep20Contract.transfer(_player, _betAmount);
         require(success, 'Withdrawal failed');
-        emit WithdrawalSucceed();
+
+        emit WithdrawalSucceed(_player, _betAmount, _BEP20Token);
     }
 
-    function percentsToAbs(uint256 _value, uint256 _percent) private pure returns (uint256) {
+    function _percentsToAbs(uint256 _value, uint256 _percent) private pure returns (uint256) {
         (bool success, uint256 result) = _value.tryMul(_percent);
         require(success);
         return result / 100;
