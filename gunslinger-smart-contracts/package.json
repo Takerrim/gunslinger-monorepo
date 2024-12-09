@@ -6,7 +6,9 @@
   "license": "MIT",
   "scripts": {
     "generate-types": "rm -rf typechain-types && hardhat typechain",
-    "compile": "rm -rf artifacts && hardhat compile"
+    "compile": "hardhat compile --force",
+    "node": "hardhat node",
+    "test": "hardhat test"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
