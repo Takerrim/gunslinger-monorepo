@@ -9,6 +9,7 @@ type TEvents =
   | 'takeDamage'
   | 'playerStopped'
 
+/** @description Transfer data from game entities to realtimeManager  */
 class EventBus extends EventEmitter<TEvents> {}
 
 export const eventBus = new EventBus()

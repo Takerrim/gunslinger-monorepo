@@ -1,0 +1,69 @@
+{
+  "frames": {
+      "spot1":
+      {
+          "frame": {"x":0,"y":0,"w":15,"h":16},
+          "spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+          "sourceSize": {"w":16,"h":16},
+          "anchor": {"x":0,"y":0}
+      },
+      "spot2":
+      {
+          "frame": {"x":16,"y":0,"w":15,"h":16},
+          "spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+          "sourceSize": {"w":16,"h":16},
+          "anchor": {"x":0,"y":0}
+      },
+      "spot3":
+      {
+          "frame": {"x":32,"y":0,"w":15,"h":16},
+          "spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+          "sourceSize": {"w":16,"h":16},
+          "anchor": {"x":0,"y":0}
+      },
+      "spot4":
+      {
+          "frame": {"x":48,"y":0,"w":15,"h":16},
+          "spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+          "sourceSize": {"w":16,"h":16},
+          "anchor": {"x":0,"y":0}
+      },
+      "spot5":
+      {
+          "frame": {"x":64,"y":0,"w":15,"h":16},
+          "spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+          "sourceSize": {"w":16,"h":16},
+          "anchor": {"x":0,"y":0}
+      },
+      "spot6":
+      {
+          "frame": {"x":80,"y":0,"w":15,"h":16},
+          "spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+          "sourceSize": {"w":16,"h":16},
+          "anchor": {"x":0,"y":0}
+      },
+      "spot7":
+      {
+          "frame": {"x":96,"y":0,"w":15,"h":16},
+          "spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+          "sourceSize": {"w":16,"h":16},
+          "anchor": {"x":0,"y":0}
+      },
+      "spot8":
+      {
+          "frame": {"x":112,"y":0,"w":15,"h":16},
+          "spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+          "sourceSize": {"w":16,"h":16},
+          "anchor": {"x":0,"y":0}
+      }
+  },
+  "animations": {
+      "spot": ["spot1", "spot2", "spot3", "spot4", "spot5", "spot6", "spot7", "spot8"]
+  },
+  "meta": {
+      "image": "/img/blood-spot.png",
+      "format": "RGBA8888",
+      "size": {"w":128,"h":16},
+      "scale": "1"
+  }
+}

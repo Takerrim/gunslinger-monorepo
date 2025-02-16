@@ -1,0 +1,1 @@
+export { BloodSpot } from './BloodSpot'

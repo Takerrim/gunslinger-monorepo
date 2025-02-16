@@ -1,6 +1,6 @@
 import { Sprite, type Application, Spritesheet, BaseTexture } from 'pixi.js'
 import { AbstractGameElement } from '../AbstractGameElement'
-import bulletsSpritesheetJson from './bullets.spritesheet.json'
+import bulletsSpritesheetJson from '~/game/spritesheets/bullets.spritesheet.json'
 import { eventBus } from '~/game/services/EventBus/EventBus'
 import { IntersectionManager } from '~/game/services/IntersectionManager'
 

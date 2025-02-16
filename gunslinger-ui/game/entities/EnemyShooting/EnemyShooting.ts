@@ -6,8 +6,7 @@ import {
   type IPointData
 } from 'pixi.js'
 import { AbstractGameElement } from '../AbstractGameElement'
-import bulletsSpritesheetJson from '../Shooting/bullets.spritesheet.json'
-import { toViewport } from '~/game/game.helpers'
+import bulletsSpritesheetJson from '~/game/spritesheets/bullets.spritesheet.json'
 
 const BULLET_SPEED_FACTOR = 20
 
@@ -25,12 +24,8 @@ export class EnemyShooting extends AbstractGameElement {
   }
 
   #changeBulletPosition(projectile: Sprite) {
-    projectile.position.set(
-      projectile.position.x +
-        Math.cos(projectile.rotation) * BULLET_SPEED_FACTOR,
-      projectile.position.y +
-        Math.sin(projectile.rotation) * BULLET_SPEED_FACTOR
-    )
+    projectile.position.x += Math.cos(projectile.rotation) * BULLET_SPEED_FACTOR
+    projectile.position.y += Math.sin(projectile.rotation) * BULLET_SPEED_FACTOR
   }
 
   get enemy() {

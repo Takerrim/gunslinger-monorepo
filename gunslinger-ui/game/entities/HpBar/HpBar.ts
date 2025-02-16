@@ -48,7 +48,6 @@ export class HpBar extends AbstractGameElement {
 
     rect.name = HP_BAR_NAME
     this.app.stage.addChild(rect)
-    console.log(rect.position.x)
   }
 
   updateHp(hp: number) {
@@ -56,7 +55,6 @@ export class HpBar extends AbstractGameElement {
     if (hpBar) {
       const { width } = this.#computeCoords(hp)
       hpBar.width = width
-      console.log(hpBar.position.x)
     }
   }
 
