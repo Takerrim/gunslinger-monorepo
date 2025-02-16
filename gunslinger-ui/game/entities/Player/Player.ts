@@ -5,8 +5,8 @@ import {
   Spritesheet,
   TilingSprite
 } from 'pixi.js'
-import playerShootingSpritesheetJson from './playerShooting.spritesheet.json'
-import playerWalkSpritesheetJson from './playerWalk.spritesheet.json'
+import playerShootingSpritesheetJson from '~/game/spritesheets/playerShooting.spritesheet.json'
+import playerWalkSpritesheetJson from '~/game/spritesheets/playerWalk.spritesheet.json'
 import { AbstractGameElement } from '../AbstractGameElement'
 import { calculateAngle, toViewport } from '~/game/game.helpers'
 import { Shooting } from '../Shooting'

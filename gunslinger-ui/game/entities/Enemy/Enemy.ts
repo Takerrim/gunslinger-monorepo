@@ -6,9 +6,10 @@ import {
   type IPointData
 } from 'pixi.js'
 // import playerShootingSpritesheetJson from './playerShooting.spritesheet.json'
-import enemyWalkSpritesheetJson from './enemyWalk.spritesheet.json'
+import enemyWalkSpritesheetJson from '~/game/spritesheets/enemyWalk.spritesheet.json'
 import { AbstractGameElement } from '../AbstractGameElement'
 import { EnemyShooting } from '../EnemyShooting'
+import { BloodSpot } from '../BloodSpot'
 
 // const VELOCITY = 3
 
@@ -78,6 +79,10 @@ export class Enemy extends AbstractGameElement {
     // this.#enemy.textures = this.firePlayerSpritesheet.animations.player
     this.#enemy.play()
     this.shooting.fire(projectilePosition)
+  }
+
+  takeDamage() {
+    const spot = new BloodSpot(this.app, this.#enemy.position)
   }
 
   stop() {

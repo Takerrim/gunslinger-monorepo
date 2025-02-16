@@ -31,6 +31,10 @@ export const renderEnemy = (app: Application) => {
 
   realtimeManager.on('enemyCeasedFire', () => {})
 
+  realtimeManager.on('hitEnemy', () => {
+    enemy.takeDamage()
+  })
+
   realtimeManager.on('enemyStopped', () => {
     enemy.stop()
   })
