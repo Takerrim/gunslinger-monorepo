@@ -13,6 +13,7 @@ import { Shooting } from '../Shooting'
 import { IntersectionManager } from '~/game/services/IntersectionManager'
 import { KeyboardService } from '~/game/services/KeyboardService'
 import { eventBus } from '~/game/services/EventBus/EventBus'
+import { BloodSpot } from '../BloodSpot'
 
 const VELOCITY = 3
 
@@ -196,6 +197,10 @@ export class Player extends AbstractGameElement {
       x: this.#player.position.x,
       y: this.#player.position.y
     })
+  }
+
+  takeDamage() {
+    new BloodSpot(this.app, this.#player.position)
   }
 
   #rotate(e: MouseEvent) {

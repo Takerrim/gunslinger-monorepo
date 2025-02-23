@@ -82,7 +82,7 @@ export class Enemy extends AbstractGameElement {
   }
 
   takeDamage() {
-    const spot = new BloodSpot(this.app, this.#enemy.position)
+    new BloodSpot(this.app, this.#enemy.position)
   }
 
   stop() {

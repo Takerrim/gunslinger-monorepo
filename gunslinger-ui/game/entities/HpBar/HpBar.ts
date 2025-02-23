@@ -1,16 +1,21 @@
 import { drawRect } from '~/game/game.helpers'
 import { AbstractGameElement } from '../AbstractGameElement'
-import type { Application, Sprite } from 'pixi.js'
+import { Text, TextStyle, type Application, type Graphics } from 'pixi.js'
+import FontFaceObserver from 'fontfaceobserver'
 
 const HP_BAR_WIDTH = 200
 const HP_BAR_HEIGHT = 30
 const HP_BAR_NAME = 'hp_bar'
+const TEXT = 'progress_text'
+
+const FONT_FAMILY = 'Press Start 2P'
 
 export class HpBar extends AbstractGameElement {
   constructor(app: Application) {
     super(app)
-    this.#renderOutline()
-    this.render()
+    this.#renderOutlineRect()
+    this.renderProgressBar()
+    this.#renderHpValue()
   }
 
   /** @param hp in percents */
@@ -19,13 +24,13 @@ export class HpBar extends AbstractGameElement {
 
     return {
       x: document.body.clientWidth - (HP_BAR_WIDTH + rightMargin),
-      y: 15,
+      y: 14,
       width: (HP_BAR_WIDTH * hp) / 100,
       height: HP_BAR_HEIGHT
     }
   }
 
-  #renderOutline() {
+  #renderOutlineRect() {
     const { x, y, width, height } = this.#computeCoords()
 
     const rect = drawRect({
@@ -38,8 +43,8 @@ export class HpBar extends AbstractGameElement {
     this.app.stage.addChild(rect)
   }
 
-  render() {
-    const { x, y, width, height } = this.#computeCoords()
+  renderProgressBar(hp = 100) {
+    const { x, y, width, height } = this.#computeCoords(hp)
 
     const rect = drawRect({
       params: [x, y, width, height],
@@ -50,12 +55,37 @@ export class HpBar extends AbstractGameElement {
     this.app.stage.addChild(rect)
   }
 
+  async #renderHpValue() {
+    const fontObserver = new FontFaceObserver(FONT_FAMILY)
+    await fontObserver.load()
+
+    const styles = new TextStyle({
+      fontFamily: FONT_FAMILY,
+      fill: '#ffffff',
+      fontSize: 12
+    })
+
+    const text = new Text('100%', styles)
+    text.name = TEXT
+    text.x = document.body.clientWidth - 90
+    text.y = 24
+    this.app.stage.addChild(text)
+  }
+
+  // width of Graphics rect is changed with horizontal shift, i do not know why, cause of this, recreate progress bar with updated width
   updateHp(hp: number) {
-    const hpBar = this.app.stage.getChildByName(HP_BAR_NAME) as Sprite
+    const hpBar = this.app.stage.getChildByName<Graphics>(HP_BAR_NAME)
     if (hpBar) {
-      const { width } = this.#computeCoords(hp)
-      hpBar.width = width
+      hpBar.removeFromParent()
     }
+
+    const hpBarText = this.app.stage.getChildByName<Text>(TEXT)
+
+    if (hpBarText) {
+      hpBarText.text = `${hp}%`
+    }
+
+    this.renderProgressBar(hp)
   }
 
   protected update(): void {}
