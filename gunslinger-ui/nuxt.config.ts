@@ -3,7 +3,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   // @ts-ignore
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
-  ssr: false
+  ssr: false,
+  css: ['~/assets/styles/fonts.css']
   // routeRules: {
   //   '/': {
   //     ssr: false,
